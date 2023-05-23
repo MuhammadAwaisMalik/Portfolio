@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './index.scss'
 import Loader from 'react-loaders'
 import AnimatedLetters from '../AnimatedLetters'
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
+import emailjs from '@emailjs/browser'
+import Swal from 'sweetalert2'
 
 const Contact = () => {
   const [letterClass, setLetterClass] = useState('text-animate')
@@ -11,6 +13,40 @@ const Contact = () => {
       setLetterClass('text-animate-hover')
     }, 4000)
   }, [])
+  const form = useRef()
+
+  const sendEmail = (e) => {
+    e.preventDefault()
+
+    emailjs
+      .sendForm(
+        'mawaisEmail',
+        'template_yakftg2',
+        form.current,
+        'iD3u-StKSk7cKzkuT'
+      )
+      .then(
+        (result) => {
+          console.log(result.text)
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Your Message has been sent to Muhammad',
+            showConfirmButton: false,
+            timer: 2500,
+          })
+        },
+        (error) => {
+          console.log(error.text)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+          })
+        }
+      )
+  }
+
   return (
     <>
       <div className="container ps-5 pt-5 contact-page">
@@ -30,21 +66,21 @@ const Contact = () => {
               form either.
             </p>
             <div className="contact-form">
-              <form action="">
+              <form ref={form} onSubmit={sendEmail}>
                 <ul>
                   <li className="half">
                     <input
                       type="text"
-                      name="name"
-                      placeholder="Name"
+                      name="from_name"
+                      placeholder="Enter Your Name"
                       required
                     />
                   </li>
                   <li className="half">
                     <input
                       type="email"
-                      name="email"
-                      placeholder="Email"
+                      name="from_email"
+                      placeholder="Enter Your Email"
                       required
                     />
                   </li>
@@ -57,7 +93,11 @@ const Contact = () => {
                     />
                   </li>
                   <li>
-                    <textarea name="meassage" placeholder="Meassage" required />
+                    <textarea
+                      name="message"
+                      placeholder="Enter Your Meassage"
+                      required
+                    />
                   </li>
                   <li>
                     <input type="submit" className="flat-button" value="Send" />
